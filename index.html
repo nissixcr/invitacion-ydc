@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Retorno a Casa - Iglesia Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050505; 
+            --terracotta: #e06d53;
+            --terracotta-hover: #c95d45;
+            --sand: #e8d8c8;
+            --text-light: #ffffff;
+            --text-muted: #a49e9a;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            min-height: 100vh;
+        }
+        .lamp-wrapper {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 101;
+            pointer-events: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 1.5s ease 0.5s, transform 1.5s ease 0.5s; 
+        }
+        .lamp-glow {
+            position: absolute;
+            top: 112px; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 240, 210, 1) 0%, rgba(224, 109, 83, 0.5) 35%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            mix-blend-mode: screen;
+            z-index: 102;
+        }
+        body.light-on .lamp-wrapper {
+            opacity: 0;
+            transform: translateY(-80px) translateX(-50%);
+        }
+        body.light-on .lamp-glow {
+            opacity: 1;
+            box-shadow: 0 0 150px 80px rgba(224, 109, 83, 0.25);
+        }
+        body.light-on #lamp-bulb {
+            fill: #ffffff;
+        }
+        .cord-container {
+            position: fixed;
+            top: 118px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
+        }
+        body.light-on .cord-container {
+            opacity: 0;
+            transform: translateY(-40px) translateX(-50%); 
+            pointer-events: none; 
+        }
+        .cord-line {
+            width: 2px; 
+            height: 100px; 
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(232, 216, 200, 0.8));
+            transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .cord-handle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(232, 216, 200, 0.8);
+            margin-top: 0px;
+            cursor: grab;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 0 15px rgba(232, 216, 200, 0.3), inset 0 0 10px rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            pointer-events: auto; 
+        }
+        .cord-handle:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(232, 216, 200, 0.6), inset 0 0 10px rgba(255,255,255,0.2);
+        }
+        .cord-handle:active {
+            cursor: grabbing;
+        }
+        .cord-handle::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--terracotta);
+            box-shadow: 0 0 8px var(--terracotta);
+            opacity: 0.9;
+        }
+        .pull-hint {
+            margin-top: 25px;
+            color: rgba(232, 216, 200, 0.75);
+            font-size: 0.8rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: pulseHint 2s infinite alternate;
+        }
+        @keyframes pulseHint {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; text-shadow: 0 0 10px rgba(232, 216, 200, 0.5); }
+        }
+        .darkness-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030303;
+            z-index: 50;
+            transition: opacity 0.8s ease-in-out;
+            pointer-events: none;
+        }
+        .bg-image {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('99 ovejas +1.jpeg');
+            background-size: cover;
+            background-position: center bottom; 
+            opacity: 0; 
+            filter: grayscale(80%) brightness(0.1);
+            z-index: 0;
+            pointer-events: none;
+            transition: all 1s ease-in-out;
+        }
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(8,8,8, 0.9) 0%, rgba(8,8,8, 0.3) 45%, transparent 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .glass-card {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 520px;
+            text-align: center;
+            padding: 3.5rem 2.5rem;
+            margin-top: 10vh; 
+            margin-bottom: 25vh; 
+            background: rgba(12, 8, 5, 0.65);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transform: translateY(60px);
+            pointer-events: none;
+            transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        body.light-on .darkness-overlay { opacity: 0; }
+        body.light-on .bg-image {
+            opacity: 1; 
+            filter: grayscale(0%) brightness(1); 
+        }
+        body.light-on .glass-card {
+            opacity: 1; 
+            transform: translateY(0); 
+            pointer-events: auto; 
+        }
+        .modern-icon {
+            width: 42px;
+            height: 42px;
+            stroke: var(--terracotta);
+            stroke-width: 1.5;
+            fill: none;
+            margin-bottom: 1.5rem;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .subtitle {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--sand);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin: 0 0 2rem 0;
+            text-transform: uppercase;
+            line-height: 1.1;
+            color: var(--text-light);
+            letter-spacing: -1px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .detail-item {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+        }
+        .detail-item strong {
+            color: var(--sand);
+            font-weight: 600;
+        }
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 3rem;
+        }
+        .time-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 15px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        .time-box:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .time-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--terracotta);
+            line-height: 1;
+            margin-bottom: 6px;
+            text-shadow: 0 0 10px rgba(224, 109, 83, 0.4);
+        }
+        .time-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--sand);
+            font-weight: 600;
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background-color: var(--terracotta);
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(224, 109, 83, 0.2);
+        }
+        .btn-primary:hover {
+            background-color: var(--terracotta-hover);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 25px rgba(224, 109, 83, 0.4);
+        }
+        .btn-secondary {
+            background-color: rgba(0, 0, 0, 0.3);
+            color: var(--sand);
+            border: 1px solid rgba(232, 216, 200, 0.4);
+        }
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(232, 216, 200, 0.8);
+            transform: translateY(-2px);
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2.6rem; }
+            .glass-card { padding: 2.5rem 1.5rem; margin-top: 10vh; }
+            .time-value { font-size: 2rem; }
+            .countdown { gap: 8px; }
+            .time-box { padding: 12px 2px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lamp-wrapper">
+        <svg width="140" height="120" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+            <rect x="69" y="0" width="2" height="60" fill="#2a2a2a"/>
+            <path d="M 65 60 L 75 60 L 75 65 L 65 65 Z" fill="var(--sand)"/>
+            <path d="M 70 65 C 45 65, 20 90, 10 110 L 130 110 C 120 90, 95 65, 70 65 Z" fill="#0a0a0a" stroke="rgba(232, 216, 200, 0.4)" stroke-width="1"/>
+            <ellipse cx="70" cy="110" rx="60" ry="6" fill="#050505" stroke="rgba(232, 216, 200, 0.2)" stroke-width="1"/>
+            <circle id="lamp-bulb" cx="70" cy="112" r="8" fill="#1a1a1a" style="transition: fill 0.3s ease;"/>
+        </svg>
+        <div class="lamp-glow"></div>
+    </div>
+    <div class="cord-container">
+        <div class="cord-line" id="cord-line"></div>
+        <div class="cord-handle" id="cord-handle"></div>
+        <div class="pull-hint">Enciende la luz</div>
+    </div>
+    <div class="darkness-overlay"></div>
+    <div class="bg-image"></div>
+    <div class="bg-gradient"></div>
+    <div class="glass-card">
+        <svg class="modern-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+            <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+        <div class="subtitle">Iglesia Cafe</div>
+        <h1>Retorno<br>a Casa</h1>
+        <div class="details-container">
+            <div class="detail-item"><strong>21 NOV 2026</strong> • 4:00 P.M.</div>
+            <div class="detail-item">La Casa de la Biblia, San José</div>
+        </div>
+        <div class="countdown" id="countdown">
+            <div class="time-box">
+                <span class="time-value" id="days">00</span>
+                <span class="time-label">Días</span>
+            </div>
+            <div class="time-box">
+                <span class="time-value" id="hours">00</span>
+                <span class="time-label">Hrs</span>
+            </div>
+            <div class="time-box">
+                <span class="time-value" id="minutes">00</span>
+                <span class="time-label">Min</span>
+            </div>
+            <div class="time-box">
+                <span class="time-value" id="seconds">00</span>
+                <span class="time-label">Seg</span>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" id="btn-whatsapp">
+                Confirmar Asistencia
+            </button>
+            <a href="https://maps.google.com/?q=La+Casa+de+la+Biblia,+San+José,+Costa+Rica" target="_blank" class="btn btn-secondary">
+                Ver Ubicación
+            </a>
+            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Retorno+a+casa+-+Iglesia+Cafe&dates=20261121T223000Z/20261122T003000Z&details=Actividad+de+jóvenes+de+Iglesia+Cafe.&location=La+Casa+de+la+Biblia,+San+José,+Costa+Rica" target="_blank" class="btn btn-secondary">
+                Agendar en Calendario
+            </a>
+        </div>
+    </div>
+    <script>
+        const cordLine = document.getElementById('cord-line');
+        const cordHandle = document.getElementById('cord-handle');
+        const body = document.body;
+        let startY = 0;
+        let isDragging = false;
+        let isLightOn = false; 
+
+        const startDrag = (e) => {
+            if (isLightOn) return; 
+            isDragging = true;
+            startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            cordLine.style.transition = 'none'; 
+        };
+
+        const onDrag = (e) => {
+            if (!isDragging) return;
+            const currentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            const pullDistance = currentY - startY;
+            if (pullDistance > 0 && pullDistance < 70) {
+                cordLine.style.height = `${100 + pullDistance}px`;
+            }
+        };
+
+        const endDrag = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            const currentHeight = parseInt(cordLine.style.height || 100);
+            cordLine.style.transition = 'height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            cordLine.style.height = '100px'; 
+            if (currentHeight > 135) {
+                turnOnLight();
+            }
+        };
+
+        const turnOnLight = () => {
+            if (!isLightOn) {
+                isLightOn = true;
+                body.classList.add('light-on');
+            }
+        };
+
+        cordHandle.addEventListener('touchstart', startDrag, { passive: true });
+        window.addEventListener('touchmove', onDrag, { passive: true });
+        window.addEventListener('touchend', endDrag);
+
+        cordHandle.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', onDrag);
+        window.addEventListener('mouseup', endDrag);
+
+        cordHandle.addEventListener('click', () => {
+            if (parseInt(cordLine.style.height || 100) <= 105) {
+                turnOnLight();
+            }
+        });
+
+        const targetDate = new Date("Nov 21, 2026 16:00:00").getTime();
+
+        const timerInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("countdown").innerHTML = "<div style='grid-column: span 4; font-size: 1.2rem; color: var(--terracotta); font-weight: 600; padding: 20px 0;'>¡El evento ha comenzado!</div>";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+        }, 1000);
+
+        document.getElementById('btn-whatsapp').addEventListener('click', function() {
+            const base64Phone = "NTA2ODk3MTE4NjI="; 
+            const phone = atob(base64Phone);
+            const message = encodeURIComponent("¡Hola! Confirmo mi asistencia a Retorno a Casa.");
+            const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        });
+    </script>
+</body>
+</html>
