@@ -27,6 +27,7 @@
             overflow-x: hidden;
             background-color: var(--bg-dark);
             min-height: 100vh;
+            overscroll-behavior-y: none; /* Bloquea el refresco hacia abajo en móviles */
         }
         .lamp-wrapper {
             position: fixed;
@@ -103,6 +104,7 @@
             align-items: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             pointer-events: auto; 
+            touch-action: none; /* Obliga al celular a ignorar el scroll táctil en esta pieza */
         }
         .cord-handle:hover {
             transform: scale(1.15);
@@ -388,7 +390,7 @@
             <a href="https://maps.google.com/?q=La+Casa+de+la+Biblia,+San+José,+Costa+Rica" target="_blank" class="btn btn-secondary">
                 Ver Ubicación
             </a>
-            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Retorno+a+casa+-+Iglesia+Cafe&dates=20261121T223000Z/20261122T003000Z&details=Actividad+de+jóvenes+de+Iglesia+Cafe.&location=La+Casa+de+la+Biblia,+San+José,+Costa+Rica" target="_blank" class="btn btn-secondary">
+            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Retorno+a+casa+-+Iglesia+Cafe&dates=20261121T220000Z/20261122T000000Z&details=Actividad+de+jóvenes+de+Iglesia+Cafe.&location=La+Casa+de+la+Biblia,+San+José,+Costa+Rica" target="_blank" class="btn btn-secondary">
                 Agendar en Calendario
             </a>
         </div>
